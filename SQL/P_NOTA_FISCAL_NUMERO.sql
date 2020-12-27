@@ -1,0 +1,40 @@
+USE [Teste]
+GO
+IF OBJECT_ID('dbo.P_NOTA_FISCAL_NUMERO') IS NOT NULL
+BEGIN
+    DROP PROCEDURE dbo.P_NOTA_FISCAL_NUMERO
+    IF OBJECT_ID('dbo.P_NOTA_FISCAL_NUMERO') IS NOT NULL
+        PRINT '<<< FALHA APAGANDO A PROCEDURE dbo.P_NOTA_FISCAL_NUMERO >>>'
+    ELSE
+        PRINT '<<< PROCEDURE dbo.P_NOTA_FISCAL_NUMERO APAGADA >>>'
+END
+go
+SET QUOTED_IDENTIFIER ON
+GO
+SET NOCOUNT ON 
+GO 
+CREATE PROCEDURE P_NOTA_FISCAL_NUMERO
+AS
+BEGIN
+ DECLARE @vNextNumber int = 0
+ DECLARE @vEnd int = 0
+
+ WHILE (@vEnd = 0) 
+  BEGIN
+   SET @vNextNumber = (select left(abs(checksum(newid())), 5));
+   IF (select count(id) from notafiscal where NumeroNotaFiscal = @vNextNumber) = 0
+    BEGIN
+	  SET @vEnd = 1
+	  Select @vNextNumber as NextNumber
+	END
+  END
+
+END
+GO
+GRANT EXECUTE ON dbo.P_NOTA_FISCAL_NUMERO TO [public]
+go
+IF OBJECT_ID('dbo.P_NOTA_FISCAL_NUMERO') IS NOT NULL
+    PRINT '<<< PROCEDURE dbo.P_NOTA_FISCAL_NUMERO CRIADA >>>'
+ELSE
+    PRINT '<<< FALHA NA CRIACAO DA PROCEDURE dbo.P_NOTA_FISCAL_NUMERO >>>'
+go
